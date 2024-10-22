@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+	<html>
+	<head>
+		<!-- Google tag (gtag.js) -->
+		<script async src="https://www.googletagmanager.com/gtag/js?id=G-QS40HB04KY"></script>
+		<script>
+		window.dataLayer = window.dataLayer || [];
+		function gtag(){dataLayer.push(arguments);}
+		gtag('js', new Date());
+
+		gtag('config', 'G-QS40HB04KY');
+		</script>
+
+		<title>Anchorit</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<link rel="stylesheet" type="text/css" href="../css/style.css">
+		<script>
+    const useFetch = async ({customeUrl = "", path, method, data, headers = null, contentType = "application/json", responseType = "application/json",}) => {
+        try {
+            const payload = {
+                method: method,
+                redirect: 'manual',
+                headers: headers ? headers : {
+                    'Accept': 'application/json',
+                },
+                body: contentType == "application/json" ? JSON.stringify(data) : data,
+            }
+
+            if (contentType == "application/json") {
+                payload.headers['Content-Type'] = "application/json"
+            }
+
+            const response = await fetch(customeUrl ? customeUrl : `https://anchorit.live${path}`, payload)
+
+            if (response.status == 401) {
+                window.location.replace("https://anchorit.live/signin");
+                return;
+            }
+
+            const res = await response.json();
+            res.status_code = response.status
+            return res;
+        } catch (err) {
+            throw err
+        }
+    }
+
+    const loadSystemTheme = () => {
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.body.classList.add("dark-theme")
+            if (document.body.classList.contains("light-theme")) {
+                document.body.classList.remove("light-theme")
+            }
+        } else {
+            document.body.classList.add("light-theme")
+            if (document.body.classList.contains("dark-theme")) {
+                document.body.classList.remove("dark-theme")
+            }
+        }
+
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+            const newColorScheme = event.matches ? "dark" : "light";
+
+            if (newColorScheme == "light") {
+                document.body.classList.add("light-theme")
+
+                if (document.body.classList.contains("dark-theme")) {
+                    document.body.classList.remove("dark-theme")
+                }
+            }
+
+            if (newColorScheme == "dark") {
+                document.body.classList.add("dark-theme")
+
+                if (document.body.classList.contains("light-theme")) {
+                    document.body.classList.remove("light-theme")
+                }
+            }
+        });
+    }
+
+    document.addEventListener("DOMContentLoaded", function(event) {
+        const theme_mode = localStorage.getItem('theme_mode')
+		if (theme_mode == "light") {
+			document.body.classList.add("light-theme")
+		}
+
+		if (theme_mode == "dark") {
+			document.body.classList.add("dark-theme")
+		}
+
+        if (theme_mode == "system") {
+			loadSystemTheme()
+		}
+    });
+
+    class MessageClass {
+        success (message, cb = () => {} ) {
+            let wrapper
+            let content
+            if (document.querySelector('.lofty-message-wrapper')) {
+                wrapper = document.querySelector('.lofty-message-wrapper')
+                content = '<div class="lofty-message-box lofty-message-success"><i class="fa-regular fa-circle-check"></i><h2>Success</h2> <span>'+message+'</span><button class="lofty-close-msg-btn">close</button></div>';
+                wrapper.innerHTML = content
+            } else {
+                const appWrapper = document.getElementById('root')
+                wrapper = document.createElement("div");
+                wrapper.classList.add("lofty-message-wrapper")
+                appWrapper.appendChild(wrapper)
+
+                content = '<div class="lofty-message-box lofty-message-success"><i class="fa-regular fa-circle-check"></i><h2>Success</h2> <span>'+message+'</span><button class="lofty-close-msg-btn">close</button></div>';
+                wrapper.innerHTML = content
+            }
+
+            if (wrapper.classList.contains("lofty-message-wrapper-out")) {
+                wrapper.classList.remove("lofty-message-wrapper-out")
+            }
+
+            wrapper.style.display = "flex"
+
+            const close_btn = document.querySelector(".lofty-close-msg-btn")
+            close_btn.addEventListener('click', (e) => {
+                e.preventDefault()
+
+                wrapper.classList.add("lofty-message-wrapper-out")
+                setTimeout(() => {
+                    wrapper.style.display = "none"
+                    cb()
+                }, 250)
+            })
+        }
+
+        error (message, cb = () => {} ) {
+            let wrapper
+            let content
+            let displayMessage = "An error occurred";
+            displayMessage = message
+
+            if (document.querySelector('.lofty-message-wrapper')) {
+                wrapper = document.querySelector('.lofty-message-wrapper')
+                content = '<div class="lofty-message-box lofty-message-error"><i class="fa-regular fa-circle-xmark"></i><h2>Error</h2> <span>'+displayMessage+'</span><button class="lofty-close-msg-btn">close</button></div>';
+                wrapper.innerHTML = content
+            } else {
+                const appWrapper = document.getElementById('root')
+                wrapper = document.createElement("div");
+                wrapper.classList.add("lofty-message-wrapper")
+                appWrapper.appendChild(wrapper)
+
+                content = '<div class="lofty-message-box lofty-message-error"><i class="fa-regular fa-circle-xmark"></i><h2>Error</h2><span>'+displayMessage+'</span><button class="lofty-close-msg-btn">close</button></div>';
+                wrapper.innerHTML = content
+            }
+
+            if (wrapper.classList.contains("lofty-message-wrapper-out")) {
+                wrapper.classList.remove("lofty-message-wrapper-out")
+            }
+
+            wrapper.style.display = "flex"
+
+            const close_btn = document.querySelector(".lofty-close-msg-btn")
+            close_btn.addEventListener('click', (e) => {
+                e.preventDefault()
+
+                wrapper.classList.add("lofty-message-wrapper-out")
+
+                setTimeout(() => {
+                    wrapper.style.display = "none"
+                    cb()
+                }, 250)
+            })
+        }
+    }
+
+    const Message = new MessageClass()
+</script>		<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" integrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g==" crossorigin="anonymous" referrerpolicy="no-referrer" rel="stylesheet" />
+	</head>
+
+	<body id="root">
+
+	
+	<style>.site-header {display: flex;flex-direction: column;width: 100%;background-color: var(--header-bg-color);position: relative;} .site-header .top-bar {display: flex;justify-content: space-between;align-items: center;position: relative;width: 100%;height: 90px;padding: 20px 8%;}.site-header .top-bar .logo img {height: 40px;}.site-header .top-bar .logo h2 {color: var(--text-color);font-size: 16px;font-weight: 600;} .site-header .top-bar .toggle-menu {display: flex;justify-content: center;align-items: center;flex-direction: column;padding: 0px 8px;width: 35px;height: 35px;cursor: pointer;}.site-header .top-bar .toggle-menu span, .site-header .top-bar .toggle-menu::before, .site-header .top-bar .toggle-menu::after {content: '';display: block;width: 100%;height: 1px;background-color: var(--text-color);}.site-header .top-bar .toggle-menu span {margin: 4px 0px;} .site-header .top-bar .site-nav {display: none;position: absolute;top: 0px;left: 0px;width: 100%;height: 100vh;z-index: 9999;}.site-header .top-bar .site-nav::before {content: '';display: block;width: 100%;height: 100%;top: 0px;left: 0px;position: absolute;background-color: #0006;cursor: pointer;}.site-header .top-bar .site-nav nav {position: relative;width: 240px;background-color: var(--dark-bg-color);left: -240px;transition: all 0.5s ease-in-out;}.site-header .top-bar .site-nav nav .nav-logo {padding: 20px 20px;}.site-header .top-bar .site-nav nav .nav-logo img {height: 40px;}.site-header .top-bar .site-nav nav ul:last-child {display: block;gap: 20px;}.site-header .top-bar .site-nav nav ul:last-child li {padding: 0px 20px;}.site-header .top-bar .site-nav nav ul:last-child li a {display: flex;justify-content: center;align-items: center;padding: 15px 20px;border: 1px solid var(--primary-color);color: var(--primary-color);border-radius: 4px;font-size: 12px;font-weight: 500;text-transform: uppercase;}.site-header .top-bar .site-nav nav ul:last-child li:last-child {margin-top: 15px;}.site-header .top-bar .site-nav nav ul:last-child li:last-child a {background-color: var(--primary-color);color: #fff;}.site-header .top-bar .site-nav nav ul.menu-links {flex: 1;margin-bottom: 20px;}.site-header .top-bar .site-nav nav ul.menu-links li {padding: 0px 20px;}.site-header .top-bar .site-nav nav ul.menu-links li a {display: block;font-size: 13px;color: var(--text-color);font-weight: 600;padding: 15px 0px;text-transform: uppercase;border-bottom: 0px solid #e1aead66;} .site-header .actions {display: flex;justify-content: center;align-items: center;position: absolute;left: 0px;bottom: 20px;width: 100%;} .site-header .actions a {display: flex;justify-content: center;align-items: center;width: 150px;height: 45px;border-radius: 8px;font-size: 16px;font-weight: 500;background-color: var(--primary-color);color: var(--text-color);}.home-header {background-color: var(--header-bg-color);} @media screen and (min-width: 880px) { .site-header .top-bar {justify-self: unset;}}@media screen and (min-width: 880px) {.site-header .top-bar .toggle-menu {display: none;}}@media screen and (min-width: 880px) {.site-header .top-bar .site-nav::before {display: none;}}@media screen and (min-width: 880px) {.site-header .top-bar .site-nav {display: flex;flex: 1;position: unset;background-color: unset;height: unset;width: unset;}}@media screen and (min-width: 880px) {.site-header .top-bar .site-nav nav {display: flex;flex-direction: row;background-color: unset;flex: 1;width: unset;height: unset;left: unset;}}@media screen and (min-width: 880px) {.site-header .top-bar .site-nav nav .nav-logo {display: none;}}@media screen and (min-width: 880px) {.site-header .top-bar .site-nav nav ul {display: flex;flex-direction: row;justify-content: center;}}@media screen and (min-width: 880px) {.site-header .top-bar .site-nav nav ul:last-child {display: flex;}}@media screen and (min-width: 880px) {.site-header .top-bar .site-nav nav ul:last-child li {padding: unset;}}@media screen and (min-width: 880px) {.site-header .top-bar .site-nav nav ul:last-child li a {padding: 10px 20px;}}@media screen and (min-width: 880px) {.site-header .top-bar .site-nav nav ul:last-child li:last-child {margin-top: 0px;}}@media screen and (min-width: 880px) {.site-header .top-bar .site-nav nav ul.menu-links {margin-bottom: 0px;}}@media screen and (min-width: 880px) {.site-header .top-bar .site-nav nav ul.menu-links li {padding: 0px;}}@media screen and (min-width: 880px) {.site-header .top-bar .site-nav nav ul.menu-links li a {display: flex;flex-direction: row;justify-content: center;padding: 15px 20px;}}</style>
+
+	<header class="site-header home-header">
+		<div class="top-bar">
+			<div class="logo">
+				<img src="../assets/img/anchor-banner.png" alt="">
+				<!-- <h2>Anchor It</h2> -->
+			</div>
+
+			<div class="site-nav">
+				<nav>
+					<div class="nav-logo">
+						<img src="../assets/img/anchor-banner.png" alt="">
+					</div>
+
+					<ul class="menu-links">
+						<li><a href="../index.html">Home</a></li>
+						<li><a href="about-us.html">About Us</a></li>
+						<li><a href="../dashboard.html">Profile</a></li>
+						<li><a href="../market-place.html">Market Place</a></li>
+						<li><a href="../referral-contest.html">Referral Contest</a></li>
+						<li><a href="../top-earners.html">Top Earners</a></li>
+						<li><a href="../team-leaderboard.html">Team Leaderboard</a></li>
+					</ul>
+					<ul class="auth-menu">
+						<li><a href="../signin.html">Login</a></li>
+						<li><a href="../signup.html">Signup</a></li>
+					</ul>
+				</nav>
+			</div>
+
+			<div class="toggle-menu">
+				<span></span>
+			</div>
+		</div>
+	</header>
+
+	<script>
+		let toggleMenu = document.querySelector(".toggle-menu")
+		let menuBox = document.querySelector(".site-nav")
+
+		toggleMenu.addEventListener('click', () => {
+			menuBox.style.display = "flex";
+			setTimeout(() => {
+				menuBox.querySelector("nav").style.left = "0px"
+			}, 200)
+		})
+
+		menuBox.addEventListener('click', (e) => {
+			if (e.target == menuBox) {
+				menuBox.querySelector("nav").style.left = "-240px"
+				setTimeout(() => {
+					menuBox.style.display = "none";
+				}, 600)
+			}
+		})
+
+	</script>
+	<div class="site-wrapper"> <!-- wrapper -->
+			<!-- container-->
+			<div class="container">
+	<div class="single-page-wrapper">
+	<div class="single-page">
+			<article class="has-thumbnail ">
+			<div class="single-post-header">
+				<div class="post-thumbnail">
+											<img src="../assets/files/img/66f2dce02cc2c8.65718966.jpeg" alt="featured image">
+									</div>
+
+				<h2 class="post-title">How it works </h2>
+				<div class="post-meta">
+									</div>
+			</div>
+
+				<div class="entry-content">
+					<iframe width="560" height="315" src="https://www.youtube.com/embed/-_rt_Fp0hqw?si=h3Hn8lxO9zY-XCo-" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe> <h2><ins><strong>HOW IT WORKS</strong></ins><br /> <br /> To be updated with the current happenings around you and in your neighborhood is something that is never to be underestimated.<br /> <br /> As the above shouldn&rsquo;t be underestimated, So is getting equipped with the latest technology information,21st century skills, a marketplace to post and upload your items for sale and an avenue to network and affiliate with one another.<br /> <br /> On Anchor, Our primary duty is to ensure that everyone that signs up on our brand gets back value for their time spent on our website either financially or non-financially.<br /> <br /> Below states the ways in details of how our website works and how we effectively carry out activities<br /> <br /> <strong><ins>AFFILIATE SET UP</ins></strong></h2> <h2><br /> On the affiliate set up, below are the informations on how to you can network,connect,learn and also earn a living from the comfort of your home through the affiliate set up.</h2> <h2><br /> *Registration fee is set at 6$ for silver users and 8.5$ for pro users, this is a one time registration fee without any other added charges.</h2> <h2><br /> *Sales commission on affiliates is 5.2$.</h2> <h2><br /> *First level spillover on sales commission is 0.4$.</h2> <h2><br /> *Second level spillover on sales is 0.2$.</h2> <h2><br /> *Daily ACH cash earnings is between 1.2$ ACH CASH-1.5 $ ACH CASH.</h2> <h2><br /> *Tiktok video contents between 1.5$ - &nbsp;$5 if approved to have won.</h2> <h2><br /> *Male and Female face of the week(Contest) is 30$ for first and 20$ for the first runner up.</h2> <h2><br /> *Monthly Entrepreneur Start up capital is 100$ for qualified users with reasonable ideas.</h2> <h2><br /> *Incentives are given to at various levels.</h2> <h2><br /> *Uploads and sales on marketplace is available to everyone once qualified.</h2> <h2>*Squid Game challenge is 50$ for the last man standing.</h2> <h2><br /> *Skills/Courses are available to everyone<br /> <br /> <strong><ins>5 ASIDE TEAM SET UP</ins></strong><br /> <br /> This set up strictly deals with the ability to network and affiliate<br /> In here, everyone is registered under a team and is expected to affiliate their team through their affiliate links<br /> <br /> At every completion of a team set up, the completed team member gets rewarded and paid directly into his bank account<br /> <br /> <br /> <ins><strong>UPLOADS AND SALES SET UP ON OUR MARKRTPLACE CHANNEL.</strong></ins><br /> <br /> On Anchor, Users can upload and also make sales from things uploaded on our website<br /> <br /> <ins><strong>TYPES OF UPLOADS AND SALES</strong></ins></h2> <h2><br /> 1. Ebooks Upload: You can simply write and upload any ebook of your type from the comforts of your home on our website and get it promoted to various users and site visitors for your sales of ebook to be completed.</h2> <p>&nbsp;</p> <h2>2. Other items for sales: Every other legitimate item for sale can be posted on our website and buyers that visits daily can patronize the advertisers: With your ACH CASH or your sales commission earnings you can appropriately upload various items for sales on our website.<br /> Various individuals can however patronize and in turn you can make profits from the comfort of your home<br /> <br /> <strong><ins>SKILLS/COURSES SET UP</ins></strong><br /> <br /> On Anchor, Our number 1 priority is ensuring that the present day skills are passed down to various individuals that signs up for our brands.</h2> <h2>&nbsp;</h2> <h2><br /> Users can easily access their skills courses from anywhere and anytime<br /> To Qualify for any of our skills classes, you&rsquo;ll need to hit the required number of ACH CASH Earnings for it , Once it&rsquo;s attained, users can freely learn an advanced course and can get it learnt from experts in the system<br /> <br /> <strong>Kindly note that our $ to N rate is fixed at N1000 irrespective of the changes in the general market.</strong><br /> <br /> <strong>Also note that before a skill can be learnt or registered for, you must meet the minimum required amount for the skills to be obtained and learnt.</strong></h2>					<div class="share-sp">
+											</div>
+				</div>
+							</article>
+			</div>
+</div>
+
+<style>
+	.share-sp {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 20px;
+	}
+	.share-form button {
+		display: flex;
+		align-items: center;
+		gap: 10px;
+		padding: 0px 20px;
+		width: 100%;
+		max-width: 340px;
+		height: 50px;
+		border-radius: 25px;
+		color: #fff;
+		color: #000;
+		margin-top: 20px;
+		border: none;
+		font-size: 15px;
+		font-weight: 500;
+		cursor: pointer;
+		background: #EEF1F6;
+		box-shadow: 10px 10px 20px 0px rgba(87, 108, 144, 0.33), -10px -10px 30px 0px #FFF;
+	}
+
+	.share-form:first-of-type button {
+		color: #c00;
+	}
+
+	
+	.share-form:last-of-type button {
+		color: #00c;
+	}
+
+
+
+	.single-page-wrapper {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		width: 100%;
+		background-color: var(--dark-bg-color);
+	}
+	.single-page-wrapper .single-page {
+		display: flex;
+		justify-content: space-between;
+		align-items: flex-start;
+		flex-direction: column;
+		width: 100%;
+		max-width: 1080px;
+	}
+	.single-page article {
+		padding: 15px;
+		color: var(--light-text-color);
+		flex: 1;
+		width: 100%;
+	}
+	.single-page .post-thumbnail {
+		position: relative;
+		width: 100%;
+		margin-bottom: 8px;
+	}
+	.single-page .post-thumbnail img {
+		width: 100%;
+	}
+	.single-page article h2.post-title {
+		font-size: 16px;
+		font-weight: 600;
+		color: var(--text-color);
+		margin-bottom: 7px;
+		text-transform: capitalize;
+	}
+	.single-page article .post-meta {
+		font-size: 13px;
+		margin-bottom: 10px;
+		padding-bottom: 10px;
+		border-bottom: 1px solid #eee;
+	}
+	.single-page article .entry-content {
+		font-size: 14px;
+		font-weight: 400;
+		line-height: 20px;
+	}
+	.single-page .side-bar {
+		width: 100%;
+		padding: 15px;
+	}
+	.single-page .side-bar h3 {
+		font-size: 16px;
+		font-weight: 600;
+		color: #5d5b5b;
+		margin-bottom: 10px;
+		text-transform: capitalize;
+	}
+	.single-page .side-bar ul li {
+		display: flex;
+		align-items: flex-start;
+		margin-bottom: 15px;
+	}
+	.single-page .side-bar ul li a {
+		display: block;
+		font-size: 14px;
+		font-weight: 400;
+		color: #5d5b5b;
+		margin-bottom: 8px;
+	}
+	.single-page .side-bar ul li span {
+		display: block;
+		color: #48A06B;
+		font-size: 12px;
+		font-weight: 400;
+	}
+	.single-page .side-bar .post-thumbnail {
+		position: relative;
+		width: 180px;
+		margin-right: 10px;
+	}
+	.single-page .side-bar .post-thumbnail img {
+		width: 100%;
+	}
+</style>
+
+<style>footer {gap: 40px;display: flex;flex-direction: column;background-color: var(--dark-bg-color);padding: 50px 8%;} footer .footer-logo {display: flex;flex-direction: column;gap: 40px;} footer .footer-logo h3 {font-size: 20px;font-weight: 600;color: var(--text-color);text-transform: uppercase;font-style: italic;}footer .footer-logo .social h5 {color: var(--text-color);font-size: 13px;font-weight: 500;text-transform: uppercase;margin-bottom: 5px;}footer .footer-logo .social ul {display: flex;gap: 10px;}footer .footer-logo .social ul li a {display: block;font-size: 20px;color: var(--text-color);} footer .footer-nav {display: flex;flex-direction: column;flex: 1;gap: 40px;} footer .footer-nav nav {flex: 1;}footer .footer-nav nav h4 {color: var(--text-color);font-weight: 700;font-size: 16px;margin-bottom: 20px;text-transform: uppercase;}footer .footer-nav nav ul {display: flex;flex-direction: column;gap: 8px;}footer .footer-nav nav ul li a {color: var(--text-color);font-weight: 400;font-size: 14px;// letter-spacing: 1px;} footer .meta {display: flex;flex-direction: column;justify-content: space-between;align-items: flex-end;gap: 20px;} footer .meta form {display: flex;width: 100%;height: 45px;border: 2px solid #fff;}footer .meta form input {flex: 1;border: none;padding: 0px 20px;height: 100%;color: var(--text-color);min-width: 20px;background-color: transparent;}footer .meta form button {width: 100px;border: none;background: #fff;font-size: 16px;} footer .meta ul {display: flex;gap: 10px;}footer .meta ul li a {color: var(--text-color);font-weight: 400;font-size: 16px;} @media screen and (min-width: 800px) { footer {flex-direction: row;}}@media screen and (min-width: 880px) { footer .footer-logo {width: 100%;max-width: 200px;}}@media screen and (min-width: 720px) { footer .footer-nav {flex-direction: row;}}</style>
+
+<!-- <script async="async" data-cfasync="false" src="//regulardisableharmony.com/a943967b6892ed30706f43462b01ca91/invoke.js"></script>
+<div id="container-a943967b6892ed30706f43462b01ca91"></div> -->
+
+			</div>
+		</div> <!-- wrapper -->
+	<footer>
+		<div class="footer-logo">
+			<h3>Anchor</h3>
+
+			<div class="social">
+				<h5>Social Media</h5>
+				<ul>
+					<li><a href="https://www.youtube.com/@AnchorSkillsInnovation"><i class="fab fa-youtube"></i></a></li>
+					<li><a href="https://wa.me/2349134396609"><i class="fab fa-whatsapp"></i></a></li>
+					<li><a href="https://vm.tiktok.com/ZMr4ruY7h"><i class="fab fa-tiktok"></i></a></li>
+					<li><a href="https://t.me/Anchorofficialchannel"><i class="fab fa-telegram"></i></a></li>
+					<li><a href="https://www.instagram.com/anchorit_official?igsh=NncyN29nczRmMWk3"><i class="fab fa-instagram"></i></a></li>
+				</ul>
+			</div>
+		</div>
+
+		<div class="footer-nav">
+			<nav>
+				<h4>About</h4>
+				<ul>
+					<li><a href="about-us.html">About Us</a></li>
+					<li><a href="how-it-works.html">How it works</a></li>
+					<li><a href="contact-us.html">Contact us</a></li>
+					<li><a href="faqs.html">FAQs</a></li>
+				</ul>
+			</nav>
+			<nav>
+				<h4>Legal</h4>
+				<ul>
+					<li><a href="terms-of-service.html">Terms Of service</a></li>
+					<li><a href="about-us.html">About Anchor</a></li>
+					<li><a href="privacy-policy.html">Privacy policy </a></li>
+					<li><a href="disclaimer.html">Disclaimer</a></li>
+				</ul>
+			</nav>
+		</div>
+
+		<div class="meta">
+			<form action="how-it-works.html">
+				<input type="text" placeholder="Enter  your username ">
+				<button><i class="fa-solid fa-magnifying-glass"></i></button>
+			</form>
+
+			<ul>
+				<li><a href="how-it-works.html#">Terms</a></li>
+				<li><a href="how-it-works.html#">Privacy</a></li>
+				<li><a href="how-it-works.html#">Cookies</a></li>
+			</ul>
+		</div>
+	</footer>
+</body>
+</html>

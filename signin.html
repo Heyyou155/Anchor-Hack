@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+	<html>
+	<head>
+		<!-- Google tag (gtag.js) -->
+		<script async src="https://www.googletagmanager.com/gtag/js?id=G-QS40HB04KY"></script>
+		<script>
+		window.dataLayer = window.dataLayer || [];
+		function gtag(){dataLayer.push(arguments);}
+		gtag('js', new Date());
+
+		gtag('config', 'G-QS40HB04KY');
+		</script>
+
+		<title>Anchorit</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<link rel="stylesheet" type="text/css" href="css/style.css">
+
+		<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" integrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g==" crossorigin="anonymous" referrerpolicy="no-referrer" rel="stylesheet" />
+		<script>
+    const useFetch = async ({customeUrl = "", path, method, data, headers = null, contentType = "application/json", responseType = "application/json",}) => {
+        try {
+            const payload = {
+                method: method,
+                redirect: 'manual',
+                headers: headers ? headers : {
+                    'Accept': 'application/json',
+                },
+                body: contentType == "application/json" ? JSON.stringify(data) : data,
+            }
+
+            if (contentType == "application/json") {
+                payload.headers['Content-Type'] = "application/json"
+            }
+
+            const response = await fetch(customeUrl ? customeUrl : `https://anchorit.live${path}`, payload)
+
+            if (response.status == 401) {
+                window.location.replace("https://anchorit.live/signin");
+                return;
+            }
+
+            const res = await response.json();
+            res.status_code = response.status
+            return res;
+        } catch (err) {
+            throw err
+        }
+    }
+
+    const loadSystemTheme = () => {
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.body.classList.add("dark-theme")
+            if (document.body.classList.contains("light-theme")) {
+                document.body.classList.remove("light-theme")
+            }
+        } else {
+            document.body.classList.add("light-theme")
+            if (document.body.classList.contains("dark-theme")) {
+                document.body.classList.remove("dark-theme")
+            }
+        }
+
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+            const newColorScheme = event.matches ? "dark" : "light";
+
+            if (newColorScheme == "light") {
+                document.body.classList.add("light-theme")
+
+                if (document.body.classList.contains("dark-theme")) {
+                    document.body.classList.remove("dark-theme")
+                }
+            }
+
+            if (newColorScheme == "dark") {
+                document.body.classList.add("dark-theme")
+
+                if (document.body.classList.contains("light-theme")) {
+                    document.body.classList.remove("light-theme")
+                }
+            }
+        });
+    }
+
+    document.addEventListener("DOMContentLoaded", function(event) {
+        const theme_mode = localStorage.getItem('theme_mode')
+		if (theme_mode == "light") {
+			document.body.classList.add("light-theme")
+		}
+
+		if (theme_mode == "dark") {
+			document.body.classList.add("dark-theme")
+		}
+
+        if (theme_mode == "system") {
+			loadSystemTheme()
+		}
+    });
+
+    class MessageClass {
+        success (message, cb = () => {} ) {
+            let wrapper
+            let content
+            if (document.querySelector('.lofty-message-wrapper')) {
+                wrapper = document.querySelector('.lofty-message-wrapper')
+                content = '<div class="lofty-message-box lofty-message-success"><i class="fa-regular fa-circle-check"></i><h2>Success</h2> <span>'+message+'</span><button class="lofty-close-msg-btn">close</button></div>';
+                wrapper.innerHTML = content
+            } else {
+                const appWrapper = document.getElementById('root')
+                wrapper = document.createElement("div");
+                wrapper.classList.add("lofty-message-wrapper")
+                appWrapper.appendChild(wrapper)
+
+                content = '<div class="lofty-message-box lofty-message-success"><i class="fa-regular fa-circle-check"></i><h2>Success</h2> <span>'+message+'</span><button class="lofty-close-msg-btn">close</button></div>';
+                wrapper.innerHTML = content
+            }
+
+            if (wrapper.classList.contains("lofty-message-wrapper-out")) {
+                wrapper.classList.remove("lofty-message-wrapper-out")
+            }
+
+            wrapper.style.display = "flex"
+
+            const close_btn = document.querySelector(".lofty-close-msg-btn")
+            close_btn.addEventListener('click', (e) => {
+                e.preventDefault()
+
+                wrapper.classList.add("lofty-message-wrapper-out")
+                setTimeout(() => {
+                    wrapper.style.display = "none"
+                    cb()
+                }, 250)
+            })
+        }
+
+        error (message, cb = () => {} ) {
+            let wrapper
+            let content
+            let displayMessage = "An error occurred";
+            displayMessage = message
+
+            if (document.querySelector('.lofty-message-wrapper')) {
+                wrapper = document.querySelector('.lofty-message-wrapper')
+                content = '<div class="lofty-message-box lofty-message-error"><i class="fa-regular fa-circle-xmark"></i><h2>Error</h2> <span>'+displayMessage+'</span><button class="lofty-close-msg-btn">close</button></div>';
+                wrapper.innerHTML = content
+            } else {
+                const appWrapper = document.getElementById('root')
+                wrapper = document.createElement("div");
+                wrapper.classList.add("lofty-message-wrapper")
+                appWrapper.appendChild(wrapper)
+
+                content = '<div class="lofty-message-box lofty-message-error"><i class="fa-regular fa-circle-xmark"></i><h2>Error</h2><span>'+displayMessage+'</span><button class="lofty-close-msg-btn">close</button></div>';
+                wrapper.innerHTML = content
+            }
+
+            if (wrapper.classList.contains("lofty-message-wrapper-out")) {
+                wrapper.classList.remove("lofty-message-wrapper-out")
+            }
+
+            wrapper.style.display = "flex"
+
+            const close_btn = document.querySelector(".lofty-close-msg-btn")
+            close_btn.addEventListener('click', (e) => {
+                e.preventDefault()
+
+                wrapper.classList.add("lofty-message-wrapper-out")
+
+                setTimeout(() => {
+                    wrapper.style.display = "none"
+                    cb()
+                }, 250)
+            })
+        }
+    }
+
+    const Message = new MessageClass()
+</script>	</head>
+
+	<body id="root">
+	<style>.wrapper {display: flex;flex-direction: column;justify-content: center;align-items: center;width: 100%;min-height: 100vh;padding: 20px 20px;background-color: var(--bg-color);position: relative;} .wrapper::before {content: '';width: 100%;height: 100%;position: absolute;z-index: 1;top: 0px;left: 0px;background-image: url('assets/img/auth-pattern.png');background-repeat: repeat;filter: var(--pattern-filter);} .wrapper .banner-wrapper {display: flex;flex-direction: column;align-items: center;gap: 6px;margin-bottom: 20px;position: relative;z-index: 3;} .wrapper .banner-wrapper img {height: 35px;width: 35px;border-radius: 50%;object-fit: cover;} .wrapper .banner-wrapper span {color: var(--text-color);font-size: 25px;font-weight: 700;}.form-wrapper {display: flex;margin: 0px auto;flex-direction: column;justify-content: center;position: relative;z-index: 3;align-items: center;padding: 20px 20px 20px 20px;background: var(--container-color);width: 100%;max-width: 480px;border-radius: 8px;} .form-wrapper form {width: 100%;} .form-wrapper form h2 {display: block;color: var(--text-color);font-size: 18px;font-weight: 600;text-align: left;margin-bottom: 5px;} .form-wrapper form .meta {margin-bottom: 20px;} .form-wrapper form .input-sec {display: flex;flex-direction: column;margin-bottom: 20px;width: 100%;max-width: 480px;gap: 8px;}.form-wrapper form .input-sec label {display: block;font-size: 14px;font-weight: 400;color: var(--light-text-color);}.form-wrapper form .input-sec input, .form-wrapper form .input-sec select {width: 100%;height: 45px;padding: 4px 10px;background-color: transparent;color: var(--text-color);border-radius: 4px;border: 0.3px solid var(--light-text-color);} .form-wrapper form .row {display: flex;align-items: flex-end;gap: 10px;width: 100%;max-width: 480px;}.form-wrapper form .row .input-sec {flex: 1;} .form-wrapper form button {display: flex;justify-content: center;align-items: center;width: 100%;border: none;border-radius: 8px;padding: 18px 0px;font-size: 15px;font-weight: 600;color: #fff;max-width: 480px;cursor: pointer;background-color: #0F4674;} .form-wrapper form .forgot-pass {display: flex;justify-content: flex-end;align-items: center;max-width: 480px;width: 100%;margin-top: -10px;margin-bottom: 20px;}.form-wrapper form .forgot-pass a {font-size: 14px;font-weight: 400;color: #40a5f7;} .form-wrapper .meta {display: flex;gap: 4px;} .form-wrapper .meta span {color: rgb(152, 162, 179);font-size: 13px;font-weight: 400;}.form-wrapper .meta span:last-child {font-weight: 500;color: var(--primary-color);} @media screen and (min-width: 880px) { .form-wrapper form {position: static;flex: 1;}}</style>
+
+<div class="wrapper">
+    <div class="banner-wrapper">
+        <img src="assets/img/logo-square.jpg" alt="">
+        <span>Anchor</span>
+    </div>
+
+    <div class="form-wrapper">
+        <form class="form-container" method="POST" action="signin.html">
+            <h2>Welcome back!</h2>
+            <a class="meta" href="signup.html">
+                <span>Don't have an account? </span>
+                <span>sign up</span>
+            </a>
+            <div class="input-sec">
+                <label for="#">Username / Email</label>
+                <input name="username" type="text" placeholder="Username or email address" />
+            </div>
+            <div class="input-sec">
+                <label for="#">Password</label>
+                <input name="password" type="password" placeholder="Password" />
+            </div>
+            <div class="forgot-pass">
+                <a href="password/forgot.html">forgot password?</a>
+            </div>
+
+            <input type="hidden" name="nocsrf" value="020da5b86563cfa834c20eaab6353d86d19de080c3353c081d3146744f62b63134d7da687a3679bb452ba12954cfffceacf2b462aa781e6283046e6e9ae54e85">
+
+            <button class="signin-btn">Sign in</button>
+        </form>
+    </div>
+</div>
+
+
+<script>
+    const form = document.querySelector('.form-container')
+    const submit_btn = document.querySelector('.form-container .signin-btn')
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault(); // Prevent the form from submitting the traditional way
+
+        const formData = new FormData(form);
+        
+        try {
+            submit_btn.classList.add("btn-loader");
+
+            const res = await useFetch({
+                path: '/signin',
+                method: 'POST',
+                contentType: 'multipart/form-data',
+                data: formData
+            })
+
+            submit_btn.classList.remove("btn-loader");
+            if (res.status_code == 200) {
+                // Message.success("Signup success successfully")
+                    // const decodedURl = decodeURIComponent(redirectPath)
+                window.location.href = "/dashboard"
+            } else {
+                Message.error(res.message)
+            }
+
+        } catch (err) {
+            submit_btn.classList.remove("btn-loader");
+            Message.error(err.message ?? "An error occurred")
+        }
+    });
+</script>
+	</body>
+</html>

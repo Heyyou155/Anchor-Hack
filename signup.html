@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Anchorit</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" type="text/css" href="css/style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" rel="stylesheet">
+
+    <script>
+        // Simulating a signup API call
+        const mockAPI = (data) => {
+            return new Promise((resolve, reject) => {
+                setTimeout(() => {
+                    if (data.user_email && data.user_password) {
+                        resolve({ success: true });
+                    } else {
+                        reject({ success: false, message: "Invalid data" });
+                    }
+                }, 1000);
+            });
+        };
+
+        class MessageClass {
+            show(message, type) {
+                let wrapper = document.querySelector('.lofty-message-wrapper');
+                let content = `<div class="lofty-message-box lofty-message-${type}">
+                                <i class="fa-regular fa-circle-${type === 'success' ? 'check' : 'times'}"></i>
+                                <h2>${type.charAt(0).toUpperCase() + type.slice(1)}</h2>
+                                <p>${message}</p>
+                                <button class="lofty-close-msg-btn">Close</button>
+                               </div>`;
+
+                if (!wrapper) {
+                    const appWrapper = document.getElementById('root');
+                    wrapper = document.createElement("div");
+                    wrapper.classList.add("lofty-message-wrapper");
+                    appWrapper.appendChild(wrapper);
+                }
+
+                wrapper.innerHTML = content;
+                wrapper.classList.remove("lofty-message-wrapper-out");
+                wrapper.style.display = "flex";
+
+                const close_btn = wrapper.querySelector(".lofty-close-msg-btn");
+                close_btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    wrapper.classList.add("lofty-message-wrapper-out");
+                    setTimeout(() => {
+                        wrapper.style.display = "none";
+                    }, 250);
+                });
+            }
+
+            success(message) {
+                this.show(message, 'success');
+            }
+
+            error(message) {
+                this.show(message, 'error');
+            }
+        }
+
+        const messageHandler = new MessageClass();
+
+        // Signup form handling
+
+document.addEventListener("DOMContentLoaded", () => {
+    const continueBtn = document.querySelector(".continue-btn");
+    const showStep1Btn = document.querySelector(".show-step-1");
+    const step1 = document.querySelector(".step-1");
+    const step2 = document.querySelector(".step-2");
+    const signupForm = document.getElementById("signupForm");
+
+    continueBtn.addEventListener("click", () => {
+        // Move to Step 2
+        step1.style.display = "none";
+        step2.style.display = "block";
+    });
+
+    showStep1Btn.addEventListener("click", () => {
+        // Go back to Step 1
+        step2.style.display = "none";
+        step1.style.display = "block";
+    });
+
+    signupForm.addEventListener("submit", async (event) => {
+        event.preventDefault(); // Prevent default form submission
+        const formData = new FormData(signupForm);
+
+        try {
+            const response = await fetch('/api/signup', {
+                method: 'POST',
+                body: formData
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to sign up');
+            }
+
+            const result = await response.json();
+            console.log(result); // Handle successful signup
+            // Redirect to the dashboard
+            window.location.href = '/dashboard.html'; // Ensure this path is correct
+
+        } catch (error) {
+            console.error('Error during signup:', error);
+            alert('Signup failed. Please try again.');
+        }
+    });
+});
+    </script>
+</head>
+
+<body id="root">
+    <div class="wrapper">
+        <div class="banner-wrapper">
+            <img src="assets/img/logo-square.jpg" alt="">
+            <span>Anchor</span>
+        </div>
+
+<div class="form-wrapper">
+    <form class="form-container" id="signupForm" method="POST">
+        <!-- Step 1: Profile Information -->
+        <div class="step-1">
+            <h2>Profile Information</h2>
+            <a class="meta" href="signin.html">
+                <span>Already have an account? </span>
+                <span>Sign in</span>
+            </a>
+            <div class="input-sec">
+                <label for="first_name">First name</label>
+                <input name="first_name" type="text" placeholder="Enter first name" required />
+            </div>
+            <div class="input-sec">
+                <label for="last_name">Last name</label>
+                <input name="last_name" type="text" placeholder="Enter last name" required />
+            </div>
+            <div class="input-sec">
+                <label for="username">Username</label>
+                <input name="username" type="text" placeholder="Enter your Username" required />
+            </div>
+            <div class="input-sec">
+                <label for="user_email">Email address</label>
+                <input name="user_email" type="email" placeholder="Enter email address" required />
+            </div>
+            <div class="input-sec">
+                <label for="user_phone">Phone number</label>
+                <input name="user_phone" type="text" placeholder="Phone number" required />
+            </div>
+            <div class="actions">
+                <button type="button" class="continue-btn">Continue</button>
+            </div>
+        </div>
+
+        <!-- Step 2: Complete Registration -->
+        <div class="step-2" style="display:none;">
+            <h2>Complete Registration</h2>
+            <div class="input-sec">
+                <label for="country">Country</label>
+                <select name="country" required>
+                    <option value="none" disabled selected>Select Country</option>
+                    <option value="Nigeria">Nigeria</option>
+                    <option value="Ghana">Ghana</option>
+                    <option value="Cameroon">Cameroon</option>
+                    <option value="Kenya">Kenya</option>
+                    <option value="Gambia">Gambia</option>
+                    <option value="South Africa">South Africa</option>
+                    <option value="Sierra Leone">Sierra Leone</option>
+                    <option value="Uganda">Uganda</option>
+                    <option value="Ivory Coast">Ivory Coast</option>
+                </select>
+            </div>
+            <div class="input-sec">
+                <label for="user_password">Password</label>
+                <input name="user_password" type="password" placeholder="Password" required />
+            </div>
+            <div class="input-sec">
+                <label for="confirm_password">Confirm password</label>
+                <input name="confirm_password" type="password" placeholder="Confirm password" required />
+            </div>
+            <div class="input-sec">
+                <select name="user_package" required>
+                    <option value="none" disabled selected>Select package</option>
+                    <option value="anchor-lite">Silver</option>
+                    <option value="anchor-pro">Pro</option>
+                </select>
+            </div>
+            <div class="terms">
+                <input name="terms" type="checkbox" required>
+                <a href="post/terms-of-service.html" target="__blank">I Agree to The Terms and Conditions</a>
+           </div>
+   <div class="actions">
+    <button type="button" class="show-step-1">Back</button>
+    <button type="submit" class="signup-btn">Sign up</button>
+ </div>
+  </div>
+    </form>
+</div>
+    <div class="lofty-message-wrapper" style="display:none;"></div>
+</body>
+</html>

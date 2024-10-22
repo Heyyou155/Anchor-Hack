@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+	<html>
+	<head>
+		<!-- Google tag (gtag.js) -->
+		<script async src="https://www.googletagmanager.com/gtag/js?id=G-QS40HB04KY"></script>
+		<script>
+		window.dataLayer = window.dataLayer || [];
+		function gtag(){dataLayer.push(arguments);}
+		gtag('js', new Date());
+
+		gtag('config', 'G-QS40HB04KY');
+		</script>
+
+		<title>Anchorit</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<link rel="stylesheet" type="text/css" href="../css/style.css">
+		<script>
+    const useFetch = async ({customeUrl = "", path, method, data, headers = null, contentType = "application/json", responseType = "application/json",}) => {
+        try {
+            const payload = {
+                method: method,
+                redirect: 'manual',
+                headers: headers ? headers : {
+                    'Accept': 'application/json',
+                },
+                body: contentType == "application/json" ? JSON.stringify(data) : data,
+            }
+
+            if (contentType == "application/json") {
+                payload.headers['Content-Type'] = "application/json"
+            }
+
+            const response = await fetch(customeUrl ? customeUrl : `https://anchorit.live${path}`, payload)
+
+            if (response.status == 401) {
+                window.location.replace("https://anchorit.live/signin");
+                return;
+            }
+
+            const res = await response.json();
+            res.status_code = response.status
+            return res;
+        } catch (err) {
+            throw err
+        }
+    }
+
+    const loadSystemTheme = () => {
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.body.classList.add("dark-theme")
+            if (document.body.classList.contains("light-theme")) {
+                document.body.classList.remove("light-theme")
+            }
+        } else {
+            document.body.classList.add("light-theme")
+            if (document.body.classList.contains("dark-theme")) {
+                document.body.classList.remove("dark-theme")
+            }
+        }
+
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+            const newColorScheme = event.matches ? "dark" : "light";
+
+            if (newColorScheme == "light") {
+                document.body.classList.add("light-theme")
+
+                if (document.body.classList.contains("dark-theme")) {
+                    document.body.classList.remove("dark-theme")
+                }
+            }
+
+            if (newColorScheme == "dark") {
+                document.body.classList.add("dark-theme")
+
+                if (document.body.classList.contains("light-theme")) {
+                    document.body.classList.remove("light-theme")
+                }
+            }
+        });
+    }
+
+    document.addEventListener("DOMContentLoaded", function(event) {
+        const theme_mode = localStorage.getItem('theme_mode')
+		if (theme_mode == "light") {
+			document.body.classList.add("light-theme")
+		}
+
+		if (theme_mode == "dark") {
+			document.body.classList.add("dark-theme")
+		}
+
+        if (theme_mode == "system") {
+			loadSystemTheme()
+		}
+    });
+
+    class MessageClass {
+        success (message, cb = () => {} ) {
+            let wrapper
+            let content
+            if (document.querySelector('.lofty-message-wrapper')) {
+                wrapper = document.querySelector('.lofty-message-wrapper')
+                content = '<div class="lofty-message-box lofty-message-success"><i class="fa-regular fa-circle-check"></i><h2>Success</h2> <span>'+message+'</span><button class="lofty-close-msg-btn">close</button></div>';
+                wrapper.innerHTML = content
+            } else {
+                const appWrapper = document.getElementById('root')
+                wrapper = document.createElement("div");
+                wrapper.classList.add("lofty-message-wrapper")
+                appWrapper.appendChild(wrapper)
+
+                content = '<div class="lofty-message-box lofty-message-success"><i class="fa-regular fa-circle-check"></i><h2>Success</h2> <span>'+message+'</span><button class="lofty-close-msg-btn">close</button></div>';
+                wrapper.innerHTML = content
+            }
+
+            if (wrapper.classList.contains("lofty-message-wrapper-out")) {
+                wrapper.classList.remove("lofty-message-wrapper-out")
+            }
+
+            wrapper.style.display = "flex"
+
+            const close_btn = document.querySelector(".lofty-close-msg-btn")
+            close_btn.addEventListener('click', (e) => {
+                e.preventDefault()
+
+                wrapper.classList.add("lofty-message-wrapper-out")
+                setTimeout(() => {
+                    wrapper.style.display = "none"
+                    cb()
+                }, 250)
+            })
+        }
+
+        error (message, cb = () => {} ) {
+            let wrapper
+            let content
+            let displayMessage = "An error occurred";
+            displayMessage = message
+
+            if (document.querySelector('.lofty-message-wrapper')) {
+                wrapper = document.querySelector('.lofty-message-wrapper')
+                content = '<div class="lofty-message-box lofty-message-error"><i class="fa-regular fa-circle-xmark"></i><h2>Error</h2> <span>'+displayMessage+'</span><button class="lofty-close-msg-btn">close</button></div>';
+                wrapper.innerHTML = content
+            } else {
+                const appWrapper = document.getElementById('root')
+                wrapper = document.createElement("div");
+                wrapper.classList.add("lofty-message-wrapper")
+                appWrapper.appendChild(wrapper)
+
+                content = '<div class="lofty-message-box lofty-message-error"><i class="fa-regular fa-circle-xmark"></i><h2>Error</h2><span>'+displayMessage+'</span><button class="lofty-close-msg-btn">close</button></div>';
+                wrapper.innerHTML = content
+            }
+
+            if (wrapper.classList.contains("lofty-message-wrapper-out")) {
+                wrapper.classList.remove("lofty-message-wrapper-out")
+            }
+
+            wrapper.style.display = "flex"
+
+            const close_btn = document.querySelector(".lofty-close-msg-btn")
+            close_btn.addEventListener('click', (e) => {
+                e.preventDefault()
+
+                wrapper.classList.add("lofty-message-wrapper-out")
+
+                setTimeout(() => {
+                    wrapper.style.display = "none"
+                    cb()
+                }, 250)
+            })
+        }
+    }
+
+    const Message = new MessageClass()
+</script>		<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" integrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g==" crossorigin="anonymous" referrerpolicy="no-referrer" rel="stylesheet" />
+	</head>
+
+	<body id="root">
+
+	
+	<style>.site-header {display: flex;flex-direction: column;width: 100%;background-color: var(--header-bg-color);position: relative;} .site-header .top-bar {display: flex;justify-content: space-between;align-items: center;position: relative;width: 100%;height: 90px;padding: 20px 8%;}.site-header .top-bar .logo img {height: 40px;}.site-header .top-bar .logo h2 {color: var(--text-color);font-size: 16px;font-weight: 600;} .site-header .top-bar .toggle-menu {display: flex;justify-content: center;align-items: center;flex-direction: column;padding: 0px 8px;width: 35px;height: 35px;cursor: pointer;}.site-header .top-bar .toggle-menu span, .site-header .top-bar .toggle-menu::before, .site-header .top-bar .toggle-menu::after {content: '';display: block;width: 100%;height: 1px;background-color: var(--text-color);}.site-header .top-bar .toggle-menu span {margin: 4px 0px;} .site-header .top-bar .site-nav {display: none;position: absolute;top: 0px;left: 0px;width: 100%;height: 100vh;z-index: 9999;}.site-header .top-bar .site-nav::before {content: '';display: block;width: 100%;height: 100%;top: 0px;left: 0px;position: absolute;background-color: #0006;cursor: pointer;}.site-header .top-bar .site-nav nav {position: relative;width: 240px;background-color: var(--dark-bg-color);left: -240px;transition: all 0.5s ease-in-out;}.site-header .top-bar .site-nav nav .nav-logo {padding: 20px 20px;}.site-header .top-bar .site-nav nav .nav-logo img {height: 40px;}.site-header .top-bar .site-nav nav ul:last-child {display: block;gap: 20px;}.site-header .top-bar .site-nav nav ul:last-child li {padding: 0px 20px;}.site-header .top-bar .site-nav nav ul:last-child li a {display: flex;justify-content: center;align-items: center;padding: 15px 20px;border: 1px solid var(--primary-color);color: var(--primary-color);border-radius: 4px;font-size: 12px;font-weight: 500;text-transform: uppercase;}.site-header .top-bar .site-nav nav ul:last-child li:last-child {margin-top: 15px;}.site-header .top-bar .site-nav nav ul:last-child li:last-child a {background-color: var(--primary-color);color: #fff;}.site-header .top-bar .site-nav nav ul.menu-links {flex: 1;margin-bottom: 20px;}.site-header .top-bar .site-nav nav ul.menu-links li {padding: 0px 20px;}.site-header .top-bar .site-nav nav ul.menu-links li a {display: block;font-size: 13px;color: var(--text-color);font-weight: 600;padding: 15px 0px;text-transform: uppercase;border-bottom: 0px solid #e1aead66;} .site-header .actions {display: flex;justify-content: center;align-items: center;position: absolute;left: 0px;bottom: 20px;width: 100%;} .site-header .actions a {display: flex;justify-content: center;align-items: center;width: 150px;height: 45px;border-radius: 8px;font-size: 16px;font-weight: 500;background-color: var(--primary-color);color: var(--text-color);}.home-header {background-color: var(--header-bg-color);} @media screen and (min-width: 880px) { .site-header .top-bar {justify-self: unset;}}@media screen and (min-width: 880px) {.site-header .top-bar .toggle-menu {display: none;}}@media screen and (min-width: 880px) {.site-header .top-bar .site-nav::before {display: none;}}@media screen and (min-width: 880px) {.site-header .top-bar .site-nav {display: flex;flex: 1;position: unset;background-color: unset;height: unset;width: unset;}}@media screen and (min-width: 880px) {.site-header .top-bar .site-nav nav {display: flex;flex-direction: row;background-color: unset;flex: 1;width: unset;height: unset;left: unset;}}@media screen and (min-width: 880px) {.site-header .top-bar .site-nav nav .nav-logo {display: none;}}@media screen and (min-width: 880px) {.site-header .top-bar .site-nav nav ul {display: flex;flex-direction: row;justify-content: center;}}@media screen and (min-width: 880px) {.site-header .top-bar .site-nav nav ul:last-child {display: flex;}}@media screen and (min-width: 880px) {.site-header .top-bar .site-nav nav ul:last-child li {padding: unset;}}@media screen and (min-width: 880px) {.site-header .top-bar .site-nav nav ul:last-child li a {padding: 10px 20px;}}@media screen and (min-width: 880px) {.site-header .top-bar .site-nav nav ul:last-child li:last-child {margin-top: 0px;}}@media screen and (min-width: 880px) {.site-header .top-bar .site-nav nav ul.menu-links {margin-bottom: 0px;}}@media screen and (min-width: 880px) {.site-header .top-bar .site-nav nav ul.menu-links li {padding: 0px;}}@media screen and (min-width: 880px) {.site-header .top-bar .site-nav nav ul.menu-links li a {display: flex;flex-direction: row;justify-content: center;padding: 15px 20px;}}</style>
+
+	<header class="site-header home-header">
+		<div class="top-bar">
+			<div class="logo">
+				<img src="../assets/img/anchor-banner.png" alt="">
+				<!-- <h2>Anchor It</h2> -->
+			</div>
+
+			<div class="site-nav">
+				<nav>
+					<div class="nav-logo">
+						<img src="../assets/img/anchor-banner.png" alt="">
+					</div>
+
+					<ul class="menu-links">
+						<li><a href="../index.html">Home</a></li>
+						<li><a href="about-us.html">About Us</a></li>
+						<li><a href="../dashboard.html">Profile</a></li>
+						<li><a href="../market-place.html">Market Place</a></li>
+						<li><a href="../referral-contest.html">Referral Contest</a></li>
+						<li><a href="../top-earners.html">Top Earners</a></li>
+						<li><a href="../team-leaderboard.html">Team Leaderboard</a></li>
+					</ul>
+					<ul class="auth-menu">
+						<li><a href="../signin.html">Login</a></li>
+						<li><a href="../signup.html">Signup</a></li>
+					</ul>
+				</nav>
+			</div>
+
+			<div class="toggle-menu">
+				<span></span>
+			</div>
+		</div>
+	</header>
+
+	<script>
+		let toggleMenu = document.querySelector(".toggle-menu")
+		let menuBox = document.querySelector(".site-nav")
+
+		toggleMenu.addEventListener('click', () => {
+			menuBox.style.display = "flex";
+			setTimeout(() => {
+				menuBox.querySelector("nav").style.left = "0px"
+			}, 200)
+		})
+
+		menuBox.addEventListener('click', (e) => {
+			if (e.target == menuBox) {
+				menuBox.querySelector("nav").style.left = "-240px"
+				setTimeout(() => {
+					menuBox.style.display = "none";
+				}, 600)
+			}
+		})
+
+	</script>
+	<div class="site-wrapper"> <!-- wrapper -->
+			<!-- container-->
+			<div class="container">
+	<div class="single-page-wrapper">
+	<div class="single-page">
+			<article class="has-thumbnail ">
+			<div class="single-post-header">
+				<div class="post-thumbnail">
+											<img src="../assets/files/img/66f47d0cc7da51.21923522.jpeg" alt="featured image">
+									</div>
+
+				<h2 class="post-title">Terms of Service </h2>
+				<div class="post-meta">
+									</div>
+			</div>
+
+				<div class="entry-content">
+					<p><strong>Terms of Service</strong></p> <p><strong>INTRODUCTION</strong></p> <p>&nbsp;</p> <p>Welcome to Anchor Technology!&nbsp;</p> <p>Anchor&nbsp;provides 3 solid product-based system that includes monetization of all social media accounts, providing a legitimate marketplace for sales and uploads of products and ensuring that high quality digital Skills ranging from Website development, Graphics designing, Copywriting skills and many more are acquired on our website. Anchor Technology provides the marketplace where only high-quality Skills are learnt and marketed to various individuals across the Globe.</p> <p>&nbsp;</p> <p>This is a legal agreement between you and Anchor Technology&nbsp;which is a trademark of MAJOR ANCHOR DYNAMISM HUB.</p> <p>This agreement defines the terms of your participation as a user/subscriber of our website.</p> <p>Please read the Anchor Technology agreement (&ldquo;agreement&rdquo;) before activating your account. By registering as a vendor/affiliate on Anchor Technology and clicking &quot;agree,&quot; you are agreeing to be bound by all terms of this agreement. If you do not agree to each of the terms of this agreement, you are not eligible to register or to become a vendor/affiliate on&nbsp;Anchor Technology and you may not buy any of our products from&nbsp;Anchor Technology or provide any products for sale via the Anchor Technology or earn commissions for promoting Anchor Technology.</p> <p>&nbsp;</p> <p>You agree that you have read and understood this Agreement (&ldquo;Agreement&rdquo;) and that your membership on ANCHOR (the &ldquo;Program&rdquo;) shall be subject to the following Terms and Conditions between you (the &ldquo;Member&rdquo;) and ANCHOR TECHNOLOGY.</p> <p>&nbsp;</p> <p>&nbsp;</p> <p>These Terms and Conditions may be modified at any time by ANCHOR Administrators without notice. Please review them from time to time since your ongoing use is subject to the terms and conditions as modified. Your continued participation in by ANCHOR after such modification shall be deemed to be your acceptance of any such modification.</p> <p>&nbsp;</p> <p><br /> If you do not agree to these Terms and Conditions, please do not register to become a member of ANCHOR.</p> <p>&nbsp;</p> <p>&nbsp;</p> <p><strong>TERMS OF PARTICIPATION</strong></p> <p>&nbsp;</p> <p><strong>Becoming a Vendor/Affiliate/Networker/User</strong></p> <p>You understand that ANCHOR&nbsp;and ANCHOR TECHNOLOGY are private communities, and Anchor reserves the right to accept or reject vendors/affiliates on any basis, in its sole discretion. To be eligible to become a vendor/affiliate on the Anchor Technology, you must complete an application to register and pay the required registration/signup fees. We will require you provide us with details sufficient for Anchor to determine if you qualify to be a vendor/affiliate, and if you are acceptable. To qualify, you must be at least 18 years old, and you must provide your real name and current/accurate and verifiable contact information. However, Anchor still reserves the right to reject your application.</p> <p>&nbsp;</p> <p>You understand and agree to provide only truthful information and to keep such information current at all times. If the information you provide to Anchor is inaccurate, it may result in delays in processing your application and could result in Anchor not being able to pay you your sales commission. If the information you provide is not truthful or cannot be verified, your application will be rejected. Anchor has the right to refuse and/or cancel any new application or existing account for any reason in its sole discretion and for no reason. Where it is discovered that misleading or inaccurate information is provided, in addition to what this clause already provided, Anchor shall not be liable for any action of the Vendor/affiliate and reserves the right to seek appropriate legal redress.</p> <p>&nbsp;</p> <p><strong>Affiliates: promoting products for a commission</strong></p> <p><br /> As an affiliate in the Anchor, you will have the opportunity to promote and make commissions on a wide variety of digital skills&nbsp;offered via the state of the art Anchor Technology. As described above, Skills&nbsp;offered through Anchor Technology are provided by our vendors for sale by Anchor.</p> <p>You evaluate and choose which Skills to promote:</p> <p>As an affiliate, you are solely responsible for evaluating and selecting the vendors and Skills&nbsp;you would like to market or advertise. Anchor Technology endeavors to maintain the highest quality in the Skills centre&nbsp;through its unique review system.&nbsp;</p> <p>However, you should understand and agree that Anchor is not responsible for the contents, accuracy, quality, usefulness, or any other aspects of any Skills.</p> <p>You understand and agree that you are solely responsible for any costs associated with marketing, advertising, or mailing, including any marketing materials you choose to develop, regardless of whether your marketing or advertising efforts results in sales or not. Moreover, Anchor Technology does not provide any legal advice or review of your advertisements, and you are solely responsible for the content of your marketing and advertising efforts and any liability resulting therefrom.</p> <p>&nbsp;</p> <p>You understand and agree that you&rsquo;re marketing and advertising efforts shall not state or suggest that you are in fact Anchor Technology or representing Anchor Technology or endorsed by Anchor Technology in any way or that you are the owner of the skills&nbsp;as this will be treated as impersonation. Your marketing and advertising will not contain or utilize the Anchor Technology content (as defined herein) except as expressly permitted.</p> <p>You understand and agree that you will not personalize the vendor of the product you are promoting in any way through your marketing and advertising or suggest that you are the vendor. If you are found to mislead people by using the name(s) of the vendor as your own, it may result in Anchor Technology terminating your affiliate account and seizing any commissions you have in your affiliate balance without any warning whatsoever.</p> <p>Anchor Technology does not allow you&nbsp;to promote, market, or advertise any Skills or utilizing advertisements that are pornographic in nature, pyramid schemes, Ponzi Schemes. You may not combine your advertising for Skills on the Anchor marketplace with advertising for any such non-permitted Skills.</p> <p>&nbsp;</p> <p>To the full extent allowed by applicable law, by ANCHOR at its sole discretion and for any or no reason may refuse to accept applications for membership.</p> <p><br /> <strong>Members may not:</strong><br /> (i) activate or use more than one Member account.</p> <p><br /> (ii) select or use an Email Address of another person.</p> <p><br /> (iii) use a name subject to rights of another person without authorization from that person.</p> <p><br /> (iv) use a false or misleading name (Except for privacy), mailing address, or email address to activate or use a Member account.</p> <p><br /> ANCHOR reserves the right to track Member&rsquo;s activity by both IP Address as well as individual browser activity.</p> <p>&nbsp;</p> <p>Member agrees not to abuse his or her membership privileges by acting in a manner inconsistent with this Agreement.</p> <p><br /> Member agrees not to attempt to earn through other means than the legitimate channels authorized by ANCHOR.</p> <p>&nbsp;</p> <p>Member agrees not to participate in any fraudulent behaviour of any kind.</p> <p>&nbsp;</p> <p>Spamming is strictly prohibited. Any spamming done to advertise ANCHOR will result in immediate termination of your account and a forfeiture of your account earning balance. Incidents will be dealt with on a case by case basis.</p> <p>&nbsp;</p> <p><strong>REFUND POLICY</strong></p> <p><br /> As we are offering virtual digital service &lsquo;COUPON CODES&rsquo; which is in&nbsp;form of the registration fee , we do not generally issue refunds after the purchase of Anchor codes&nbsp;has been made.&nbsp;</p> <p><br /> Please note that by purchasing the ANCHOR activation code, you agree to the no Refund Policy.</p> <p>&nbsp;</p> <p><strong>MEMBERSHIP ACTIVITIES; POSTING ON MARKETPLACE, PLAYING GAMES. AFFILIATING AND COMMENTING:</strong></p> <p>&nbsp;</p> <p>Administrators, Editors and Moderators reserve the right to approve or disapprove contents or comments posted on the Anchor. As an Anchor member, you will only earn and get a revenue shared paid to your bank account when you abide by the following rules:</p> <p>&nbsp;</p> <p>Sponsored post sharing must correspond with the post date and must be shared as recommended, and users may only earn from current sponsored post and not from old ones else the accounts will have technical issues when discovered</p> <p>&nbsp;</p> <p><strong>PAYMENT OF COMPENSATIONS FOR NETWORKING/AFFILIATE MARKETING&nbsp;</strong></p> <p>&nbsp;</p> <p>Users who earn sales commissions on the affiliate structure gets to apply Mondays and Thursdays for their earned compensation</p> <p>After various applications by users, the payments of compensation for each users Affiliate/networking skills commences the same day up until the whole applicants are successfully paid their commissions&nbsp;</p> <p>&nbsp;</p> <p>Member shall comply with all laws, rules, and regulations that are applicable to member. Member acknowledges that Member may only participate in ANCHOR if and to the extent that such participation is permitted by such laws, rules, and regulations.</p> <p>&nbsp;</p> <p>If member objects to any of the Terms and Conditions of this Agreement, or any subsequent modifications to this agreement, or becomes dissatisfied with the Program, Member&rsquo;s only recourse is to immediately discontinue participation in or failure to notify ANCHOR.</p> <p>&nbsp;</p> <p><strong>DISCLAIMER OF LIABILITY:</strong></p> <p>&nbsp;</p> <p>To the extent not prohibited by law, under no circumstances shall Anchor Technology be liable with respect to&nbsp;&nbsp;services for special, indirect, incidental, or consequential damages, including without limitation, damages resulting from failure to deliver or delay of delivery of services, or failure of Anchor Technology, or from loss of profits, sales, data, business, opportunity or goodwill, on any theory of liability, whether arising under tort (including negligence), contract or otherwise, whether or not Anchor Technology has been advised of or is aware of the possibility of such damages. if, notwithstanding any other provisions of this agreement, Anchor Technology is found to be liable to you for any damage or loss that arises out of or is in any way connected to your use of the services, Anchor Technology&rsquo;s entire liability for direct damages under this agreement shall be limited to forty three naira only which is 0.5% of the registration fee only</p> <p><br /> <br /> <strong>WAIVER:</strong></p> <p>&nbsp;</p> <p>If any provision of this agreement is found to be unenforceable or invalid, to the extent permissible under applicable law, that provision shall be limited or eliminated to the minimum extent necessary so that this agreement shall otherwise remain in full force and effect and enforceable.<br /> &nbsp;</p> <p><strong>ARBITRATION:</strong></p> <p>&nbsp;</p> <p>Any dispute arising out of or related to or connected with any provisions under this Agreement shall be referred to the arbitration of a single arbitrator to be appointed jointly by the parties.</p> <p>The language of arbitration shall be English.</p> <p>The award of the arbitrator or arbitrators as the case may be shall be final and binding on the parties.</p> <p>&nbsp;</p> <p><strong>JURISDICTION AND GOVERNING LAW:</strong></p> <p>&nbsp;</p> <p>The obligations, performance, interpretation and contents shall be governed by Nigerian law.</p> <p><strong>Notices</strong></p> <p>All notices and other communication under this Agreement shall be in writing and in English and either delivered by hand or sent by telex, fax or courier in each case to the addresses set out on the website of Anchor Technology in the case of Anchor and addressee submitted by vendors/affiliates where the notice to vendors/affiliates</p> <p>&nbsp;</p> <p><strong>ENTIRE AGREEMENT:</strong></p> <p>&nbsp;</p> <p>This Agreement embodies the entire agreement and understanding of the Parties and supersedes any and all other prior and contemporaneous agreements, arrangements and understandings (whether written or oral) between the Parties with respect to its subject matter.</p> <p>&nbsp;</p> <p><strong>ASSIGNMENT:</strong></p> <p>&nbsp;</p> <p>Neither this Agreement nor any part of it is assignable, transferable, sub-licensable, sub contractable or conveyable by Vendor/Affiliate, either by operation of law or otherwise, without the express, prior, written consent of Anchor Technology signed by an authorized representative of such Party.</p> <p>&nbsp;</p> <p><strong>CONFIDENTIALITY:</strong></p> <p>&nbsp;</p> <p>Vendor/Affiliate agrees and undertakes to maintain the confidentiality of the information and user/customer data disclosed, generated or made available to Vendor/Affiliate under this Agreement.</p> <p>The said information shall not be used by the Vendor/Affiliate for any purpose other than for the performance of its obligations under this Agreement. Vendor agrees that the unauthorized disclosure or use of such Information would cause irreparable harm and significant injury, the degree of which may be difficult to ascertain. Accordingly, Vendor/Affiliate agrees that Anchor Technology shall have the right to obtain an immediate injunction from any court of competent jurisdiction enjoining breach of this Agreement and/or disclosure of the Confidential Information. Anchor Technology shall also have the right to pursue any other rights or remedies available at law or equity for such a breach.</p> <p>&nbsp;</p> <p><strong>RELATIONSHIPS OF PARTIES:</strong></p> <p>&nbsp;</p> <p>Nothing in this Agreement will be construed as creating a relationship of partnership, joint venture, agency or employment between the Parties. Anchor Technology shall not be responsible for the acts or omissions of the Vendor/Affiliate, and Vendor/Affiliate shall not represent neither has, any power or authority to speak for, represent, bind or assume any obligation on behalf of the Anchor Technology.</p> <p>&nbsp;</p> <p><strong>WAIVER AND AMMENDMENT:</strong></p> <p>&nbsp;</p> <p>No waiver of any breach of any provision of this Agreement constitutes a waiver of any prior, concurrent or subsequent breach of the same or any other provisions, and will not be effective unless made in writing and signed by an authorized representative of the waiving Party.</p> <p>&nbsp;</p> <p><strong>DISCLAIMERS:</strong></p> <p>&nbsp;</p> <p>MEMBER EXPRESSLY AGREES THAT USE OF THE SERVICE IS AT MEMBER&rsquo;S SOLE RISK. THE SERVICE IS PROVIDED ON AN &ldquo;AS IS&rdquo; AND &ldquo;AS AVAILABLE&rdquo; BASIS. TO THE MAXIMUM EXTENT ALLOWED BY APPLICABLE NIGERIAN LAW, NIPEXPRESSLY DISCLAIMS ALL WARRANTIES OF ANY KIND, EXPRESS OR IMPLIED BY LAW, CUSTOM OR OTHERWISE, INCLUDING WITHOUT LIMITATION ANY WARRANTY OF MERCHANTABILITY, SATISFACTORY QUALITY, FITNESS FOR A PARTICULAR PURPOSE OR NON-INFRINGEMENT. ACTIVITIES THAT PAYS MAKES NO WARRANTY REGARDING ANY GOODS OR SERVICES PURCHASED OR OBTAINED THROUGH THE PROGRAM OR ANY TRANSACTIONS ENTERED INTO THROUGH THE PROGRAM.</p> <p>&nbsp;</p> <p>TO THE MAXIMUM EXTENT ALLOWED BY APPLICABLE NIGERIAN LAW, NEITHER ACTIVITIES THAT PAYS NOR ANY OF ITS MEMBERS, SUBSIDIARIES, PUBLISHERS, SERVICE PROVIDERS, LICENSORS, OFFICERS, DIRECTORS OR EMPLOYEES SHALL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL OR CONSEQUENTIAL DAMAGES ARISING OUT OF OR RELATING TO THIS AGREEMENT, RESULTING FROM THE USE OR THE INABILITY TO USE THE SERVICE OR FOR THE COST OF PROCUREMENT OF SUBSTITUTE GOODS AND SERVICES OR RESULTING FROM ANY GOODS OR SERVICES PURCHASED OR OBTAINED OR MESSAGES RECEIVED OR TRANSACTIONS ENTERED INTO THROUGH THE PROGRAM OR RESULTING FROM UNAUTHORIZED ACCESS TO OR ALTERATION OF USER&rsquo;S TRANSMISSIONS OR DATA, INCLUDING BUT NOT LIMITED TO, DAMAGES FOR LOSS OF PROFITS, USE, DATA OR OTHER INTANGIBLE, EVEN IF SUCH PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.</p> <p>KINDLY NOTE THAT YOU MIGHT NOT GET PAID AT THE END OF THE WHOLE SESSION, ANCHOR WILL NOT BE HELD LIABLE FOR NON PAYMENTS OF SPECIFIC USERS COMMISIONS AS WE CAN ONLY KEEP SHARING AVAILABLE REVENUE TO USERS ACROSS, AND WHEN THE AVAILABLE REVENUE FROM REGISTRATIONS, SPONSORSHIPS, ADDITIONAL FUNDS, ADVERT PLACEMENTS, AND GOOGLE ADSENSE IS EXHAUSTED, WE CAN ONLY WAIT TILL MORE COMES IN BEFORE PAYMENTS CAN BE APPORTIONED TO USERS.</p> <p>&nbsp;</p> <p>To prevent unauthorized access, maintain data accuracy, and ensure the correct use of information, ANCHOR uses appropriate industry standard procedures to safeguard the confidentiality of Member&rsquo;s personal information, such as SSL, firewall, encryption, token authentication, application proxies, monitoring technology, and adaptive analysis of the Website&rsquo;s traffic to track abuse of the ANCHOR Website and its data. However, no data transmitted over the Internet can be 100% secure. As a result, while ANCHOR strives to protect its Members personal information, ANCHOR cannot guarantee the security of any information that Members transmit to or from the participating advertisers/merchants and Member does so at his/her own risk.</p> <p>&nbsp;</p> <p>This Agreement constitutes the entire Agreement between Member and ANCHOR in connection with general membership in the ANCHOR and supersedes all prior agreements between the parties regarding the subject matter contained herein. If any provision of this AGREEMENT is found invalid or unenforceable, that provision will be enforced to the maximum extent permissible, and the other provisions of this AGREEMENT will remain in force. Failure of either party to exercise or enforce any of its rights under this AGREEMENT, within two(2) months the cause arose, will act as a waiver of such rights. In the event of any dispute or need for interpretation or enforcement of terms, arising out of this agreement, parties shall refer to ARBITRATION &nbsp;before litigation</p> <p>&nbsp;</p>					<div class="share-sp">
+											</div>
+				</div>
+							</article>
+			</div>
+</div>
+
+<style>
+	.share-sp {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 20px;
+	}
+	.share-form button {
+		display: flex;
+		align-items: center;
+		gap: 10px;
+		padding: 0px 20px;
+		width: 100%;
+		max-width: 340px;
+		height: 50px;
+		border-radius: 25px;
+		color: #fff;
+		color: #000;
+		margin-top: 20px;
+		border: none;
+		font-size: 15px;
+		font-weight: 500;
+		cursor: pointer;
+		background: #EEF1F6;
+		box-shadow: 10px 10px 20px 0px rgba(87, 108, 144, 0.33), -10px -10px 30px 0px #FFF;
+	}
+
+	.share-form:first-of-type button {
+		color: #c00;
+	}
+
+	
+	.share-form:last-of-type button {
+		color: #00c;
+	}
+
+
+
+	.single-page-wrapper {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		width: 100%;
+		background-color: var(--dark-bg-color);
+	}
+	.single-page-wrapper .single-page {
+		display: flex;
+		justify-content: space-between;
+		align-items: flex-start;
+		flex-direction: column;
+		width: 100%;
+		max-width: 1080px;
+	}
+	.single-page article {
+		padding: 15px;
+		color: var(--light-text-color);
+		flex: 1;
+		width: 100%;
+	}
+	.single-page .post-thumbnail {
+		position: relative;
+		width: 100%;
+		margin-bottom: 8px;
+	}
+	.single-page .post-thumbnail img {
+		width: 100%;
+	}
+	.single-page article h2.post-title {
+		font-size: 16px;
+		font-weight: 600;
+		color: var(--text-color);
+		margin-bottom: 7px;
+		text-transform: capitalize;
+	}
+	.single-page article .post-meta {
+		font-size: 13px;
+		margin-bottom: 10px;
+		padding-bottom: 10px;
+		border-bottom: 1px solid #eee;
+	}
+	.single-page article .entry-content {
+		font-size: 14px;
+		font-weight: 400;
+		line-height: 20px;
+	}
+	.single-page .side-bar {
+		width: 100%;
+		padding: 15px;
+	}
+	.single-page .side-bar h3 {
+		font-size: 16px;
+		font-weight: 600;
+		color: #5d5b5b;
+		margin-bottom: 10px;
+		text-transform: capitalize;
+	}
+	.single-page .side-bar ul li {
+		display: flex;
+		align-items: flex-start;
+		margin-bottom: 15px;
+	}
+	.single-page .side-bar ul li a {
+		display: block;
+		font-size: 14px;
+		font-weight: 400;
+		color: #5d5b5b;
+		margin-bottom: 8px;
+	}
+	.single-page .side-bar ul li span {
+		display: block;
+		color: #48A06B;
+		font-size: 12px;
+		font-weight: 400;
+	}
+	.single-page .side-bar .post-thumbnail {
+		position: relative;
+		width: 180px;
+		margin-right: 10px;
+	}
+	.single-page .side-bar .post-thumbnail img {
+		width: 100%;
+	}
+</style>
+
+<style>footer {gap: 40px;display: flex;flex-direction: column;background-color: var(--dark-bg-color);padding: 50px 8%;} footer .footer-logo {display: flex;flex-direction: column;gap: 40px;} footer .footer-logo h3 {font-size: 20px;font-weight: 600;color: var(--text-color);text-transform: uppercase;font-style: italic;}footer .footer-logo .social h5 {color: var(--text-color);font-size: 13px;font-weight: 500;text-transform: uppercase;margin-bottom: 5px;}footer .footer-logo .social ul {display: flex;gap: 10px;}footer .footer-logo .social ul li a {display: block;font-size: 20px;color: var(--text-color);} footer .footer-nav {display: flex;flex-direction: column;flex: 1;gap: 40px;} footer .footer-nav nav {flex: 1;}footer .footer-nav nav h4 {color: var(--text-color);font-weight: 700;font-size: 16px;margin-bottom: 20px;text-transform: uppercase;}footer .footer-nav nav ul {display: flex;flex-direction: column;gap: 8px;}footer .footer-nav nav ul li a {color: var(--text-color);font-weight: 400;font-size: 14px;// letter-spacing: 1px;} footer .meta {display: flex;flex-direction: column;justify-content: space-between;align-items: flex-end;gap: 20px;} footer .meta form {display: flex;width: 100%;height: 45px;border: 2px solid #fff;}footer .meta form input {flex: 1;border: none;padding: 0px 20px;height: 100%;color: var(--text-color);min-width: 20px;background-color: transparent;}footer .meta form button {width: 100px;border: none;background: #fff;font-size: 16px;} footer .meta ul {display: flex;gap: 10px;}footer .meta ul li a {color: var(--text-color);font-weight: 400;font-size: 16px;} @media screen and (min-width: 800px) { footer {flex-direction: row;}}@media screen and (min-width: 880px) { footer .footer-logo {width: 100%;max-width: 200px;}}@media screen and (min-width: 720px) { footer .footer-nav {flex-direction: row;}}</style>
+
+<!-- <script async="async" data-cfasync="false" src="//regulardisableharmony.com/a943967b6892ed30706f43462b01ca91/invoke.js"></script>
+<div id="container-a943967b6892ed30706f43462b01ca91"></div> -->
+
+			</div>
+		</div> <!-- wrapper -->
+	<footer>
+		<div class="footer-logo">
+			<h3>Anchor</h3>
+
+			<div class="social">
+				<h5>Social Media</h5>
+				<ul>
+					<li><a href="https://www.youtube.com/@AnchorSkillsInnovation"><i class="fab fa-youtube"></i></a></li>
+					<li><a href="https://wa.me/2349134396609"><i class="fab fa-whatsapp"></i></a></li>
+					<li><a href="https://vm.tiktok.com/ZMr4ruY7h"><i class="fab fa-tiktok"></i></a></li>
+					<li><a href="https://t.me/Anchorofficialchannel"><i class="fab fa-telegram"></i></a></li>
+					<li><a href="https://www.instagram.com/anchorit_official?igsh=NncyN29nczRmMWk3"><i class="fab fa-instagram"></i></a></li>
+				</ul>
+			</div>
+		</div>
+
+		<div class="footer-nav">
+			<nav>
+				<h4>About</h4>
+				<ul>
+					<li><a href="about-us.html">About Us</a></li>
+					<li><a href="how-it-works.html">How it works</a></li>
+					<li><a href="contact-us.html">Contact us</a></li>
+					<li><a href="faqs.html">FAQs</a></li>
+				</ul>
+			</nav>
+			<nav>
+				<h4>Legal</h4>
+				<ul>
+					<li><a href="terms-of-service.html">Terms Of service</a></li>
+					<li><a href="about-us.html">About Anchor</a></li>
+					<li><a href="privacy-policy.html">Privacy policy </a></li>
+					<li><a href="disclaimer.html">Disclaimer</a></li>
+				</ul>
+			</nav>
+		</div>
+
+		<div class="meta">
+			<form action="terms-of-service.html">
+				<input type="text" placeholder="Enter  your username ">
+				<button><i class="fa-solid fa-magnifying-glass"></i></button>
+			</form>
+
+			<ul>
+				<li><a href="terms-of-service.html#">Terms</a></li>
+				<li><a href="terms-of-service.html#">Privacy</a></li>
+				<li><a href="terms-of-service.html#">Cookies</a></li>
+			</ul>
+		</div>
+	</footer>
+</body>
+</html>
